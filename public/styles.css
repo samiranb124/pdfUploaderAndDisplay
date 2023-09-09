@@ -1,0 +1,43 @@
+/* Style for the PDF viewer container */
+#pdf-viewer-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    align-items: flex-start;
+    margin-top: 20px;
+  }
+  
+  /* Style for each individual page canvas */
+  canvas {
+    border: 1px solid #ccc;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    margin-bottom: 10px;
+    background-color: white;
+  }
+  
+  /* Style for the file upload form */
+  form {
+    margin-top: 20px;
+  }
+  
+  /* Style for the upload button */
+  button {
+    padding: 10px 15px;
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+  }
+  
+  /* Style for the upload button on hover */
+  button:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Center the upload button */
+  button[type="submit"] {
+    display: block;
+    margin: 0 auto;
+  }
+  

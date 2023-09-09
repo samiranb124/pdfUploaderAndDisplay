@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Viewer</title>
+    <link rel="stylesheet" href="styles.css">
+
+</head>
+<body>
+    <h1>Upload a PDF File</h1>
+    <form action="/upload" method="POST" enctype="multipart/form-data">
+        <input type="file" name="pdfFile" accept=".pdf">
+        <button type="submit">Upload PDF</button>
+    </form>
+
+    <div id="pdf-viewer-header">
+        <!-- Display the total number of pages here -->
+    </div>
+
+    <div id="pdf-viewer-container">
+        <!-- PDF viewer will be rendered here -->
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.min.js"></script>
+    <script >
+
+
+document.addEventListener('DOMContentLoaded', function () {
+  const pdfViewerHeader = document.getElementById('pdf-viewer-header');
+  const pdfViewerContainer = document.getElementById('pdf-viewer-container');
+
+  // This will store the PDF file URL after upload
+  let pdfFileURL;
+
+  // Function to load and display PDF pages
+  function loadAndDisplayPDF() {
+    if (!pdfFileURL) {
+      console.error('PDF file URL is not available.');
+      return;
+    }
+
+    pdfjsLib.getDocument(pdfFileURL).promise.then(function (pdfDoc) {
+      const numPages = pdfDoc.numPages;
+
+      // Display the total number of pages in the header
+      pdfViewerHeader.textContent = `Total Pages: ${numPages}`;
+
+      for (let pageNumber = 1; pageNumber <= numPages; pageNumber++) {
+        pdfDoc.getPage(pageNumber).then(function (page) {
+          const canvas = document.createElement('canvas');
+          pdfViewerContainer.appendChild(canvas);
+
+          const viewport = page.getViewport({ scale: 1.5 });
+          canvas.height = viewport.height;
+          canvas.width = viewport.width;
+
+          page
+            .render({
+              canvasContext: canvas.getContext('2d'),
+              viewport: viewport,
+            })
+            .promise.catch(function (reason) {
+              console.error('Error rendering page:', reason);
+            });
+        });
+      }
+    });
+  }
+
+  // Add an event listener to the form for handling file upload
+  const form = document.querySelector('form');
+  form.addEventListener('submit', function (e) {
+    e.preventDefault(); // Prevent the form from submitting normally
+
+    const formData = new FormData(form);
+
+    // Send a POST request to the server to upload the file
+    fetch('/upload', {
+      method: 'POST',
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success && data.fileURL) {
+          pdfFileURL = data.fileURL; // Store the file URL
+          pdfViewerContainer.innerHTML = ''; // Clear previous content
+          loadAndDisplayPDF(); // Load and display the PDF
+        } else {
+          console.error('Error uploading the PDF file.');
+        }
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+  });
+});
+
+    </script>
+</body>
+</html>
